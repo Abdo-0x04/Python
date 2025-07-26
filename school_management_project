@@ -1,0 +1,160 @@
+schools = {"Notre Dame Language School":[],"El Maaref Modern Language School":[]}
+students=[{"name": "Ali", "age": 10, "grades": [85, 90, 78], "school": "Notre Dame Language School"},
+    {"name": "Mona", "age": 8, "grades": [40, 35, 45], "school": "Notre Dame Language School"},
+    {"name": "Omar", "age": 12, "grades": [95, 88, 92], "school": "El Maaref Modern Language School"},
+    {"name": "Laila", "age": 9, "grades": [70, 75, 80], "school": "El Maaref Modern Language School"},
+    {"name": "Ahmed", "age": 11, "grades": [60, 65, 55], "school": "Notre Dame Language School"},
+    {"name": "Fatima", "age": 13, "grades": [82, 78, 85], "school": "El Maaref Modern Language School"},
+    {"name": "Hassan", "age": 15, "grades": [90, 92, 88], "school": "El Maaref Modern Language School"},
+    {"name": "Sara", "age": 14, "grades": [88, 92, 84], "school": "Notre Dame Language School"}]
+stages = {
+    "primary 1": [],
+    "primary 2": [],
+    "primary 3": [],
+    "primary 4": [],
+    "primary 5": [],
+    "primary 6": [],
+    "preparatory 1": [],
+    "preparatory 2": [],
+    "preparatory 3": [],
+    "secondary 1": [],
+    "secondary 2": [],
+    "secondary 3": []
+}
+def add_student():
+    while True:     
+     name=input("enter the student's name:")
+     if any(student["name"].lower() == name.lower() for student in students):
+        print("Student already exists.")
+        continue
+     if not name.isalpha():
+        print("Invalid name. Please enter a valid name containing only letters.")
+        continue
+     break
+    age_int = int(input("enter the student's age:"))
+    while not (6 <= age_int <= 17):
+        print("Invalid age. Please enter a valid age between 6 and 17.")
+        age_int = int(input("enter the student's age:"))
+    age = age_int
+    grades=[]
+    for i in range(3):
+        while True:
+            grade_input = input(f"Enter the student's grade for subject {i+1}: ")
+            if grade_input.replace('.', '', 1).isdigit():
+                grade = float(grade_input)
+                if 0 <= grade <= 100:
+                    grades.append(grade)
+                    break
+            print("Invalid grade. Please enter a number between 0 and 100.")    
+    while True:
+        school = input("Enter the student's school name: ").strip()
+        if school in schools:
+            break
+        print("School not found. Please enter a valid school.")
+
+    student = {"name": name, "age": age, "grades": grades, "school": school}
+    students.append(student)
+    print("Student information added successfully.")
+
+def transfer_student(name, age):
+    for student in students:
+        if student["name"].lower() == name.lower() and student["age"] == age:
+            grades = student["grades"]
+            avg_grade = sum(grades) / len(grades)
+            if avg_grade < 60:
+                print(f"{name} was not accepted due to low grades. Average: {avg_grade:.2f}%")
+                return  
+            break  
+    else:
+        print("Student not found or age mismatch.")
+        return 
+    if age == 6:
+        stage = "primary 1"
+    elif age == 7:
+        stage = "primary 2"
+    elif age == 8:
+        stage = "primary 3"
+    elif age == 9:
+        stage = "primary 4"
+    elif age == 10:
+        stage = "primary 5"
+    elif age == 11:
+        stage = "primary 6"
+    elif age == 12:
+        stage = "preparatory 1"
+    elif age == 13:
+        stage = "preparatory 2"
+    elif age == 14:
+        stage = "preparatory 3"
+    elif age == 15:
+        stage = "secondary 1"
+    elif age == 16:
+        stage = "secondary 2"
+    elif age == 17:
+        stage = "secondary 3"
+    else:
+        print("Invalid age for school transfer.")
+        return
+    new_school = input("Enter the new school name: ").strip()
+    if new_school in schools:
+        schools[new_school].append((name, age))
+        print(f"{name} has been transferred to {new_school} and placed in {stage}.")
+    else:
+        print("School not found.")
+
+def expell_student():
+    name = input("Enter the student's name to expel: ").strip()
+    found = False
+    for school, enrolled_students in schools.items():
+        for student in enrolled_students:
+            if student[0].lower() == name.lower():
+                enrolled_students.remove(student)
+                print(f"{name} has been expelled from {school}.")
+                found = True
+                break
+        if found:
+            break
+    if not found:
+        print("Student not found in any school.")
+
+def get_student_degrees(name, age):
+    for student in students:
+        if student["name"].lower() == name.lower() and student["age"] == age:
+            print(f"Previous grades for {name}:")
+            for i, grade in enumerate(student["grades"], 1):
+                print(f"  Subject {i}: {grade}")
+            avg = sum(student["grades"]) / len(student["grades"])
+            print(f"  Average Grade: {avg:.2f}%")
+            return
+    print("Student not found or age mismatch.")
+
+################# MAIN PROGRAM #################
+while True:
+        print("\n======================================================================")
+        print("Welcome to the School Management System")
+        print("1. Add Student")
+        print("2. Transfer Student ")
+        print("3. Expel Student")
+        print("4. Get Student Degrees")
+        print("5. Exit")
+        print("======================================================================")
+        
+        choice = input("Please choose an option (1-5): ")
+        
+        if choice == "1":
+            add_student()
+        elif choice == "2":
+            name = input("Enter the student's name: ")
+            age = int(input("Enter the student's age: "))
+            transfer_student(name, age)
+        elif choice == "3":
+            expell_student()
+        elif choice == "4":
+            name = input("Enter the student's name: ")
+            age = int(input("Enter the student's age: "))
+            get_student_degrees(name, age)
+        elif choice == "5":
+            print("Exiting the system. Thank you!")
+            break
+        else:
+            print("Invalid choice, please try again.")
