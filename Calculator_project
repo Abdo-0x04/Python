@@ -1,1 +1,304 @@
+import math
+class ScientificCalculator:
+    def __init__(self):
+        self.angle_mode = "DEG"
+        self.shift_mode = False
+        self.last_result = 0
 
+    def toggle_angle_mode(self):
+        self.angle_mode = "RAD" if self.angle_mode == "DEG" else "DEG"
+        return f"Angle mode switched to {self.angle_mode}"
+
+    def toggle_shift(self):
+        self.shift_mode = not self.shift_mode
+        return "Shift ON" if self.shift_mode else "Shift OFF"
+
+    def to_radians(self, x):
+        if self.angle_mode == "DEG":
+         return math.radians(x)
+        else: x
+         
+    def add(self, x, y):
+        return x + y
+    def subtract(self, x, y):
+        return x - y
+    def multiply(self, x, y):
+        return x * y
+    def divide(self, x, y):
+        if y == 0: 
+            return "Error: Cannot divide by zero."
+        else: 
+            return x / y
+    def power(self, x, y):
+        return math.pow(x, y)
+    def square(self, x):
+        return x * x
+    def sqrt(self, x):
+        return "Error: Negative root." if x < 0 else math.sqrt(x)
+    def cbrt(self, x):
+        return "Error: Negative root." if x < 0 else x**(1/3)
+
+    def log10(self, x):
+        return "Error: log10 undefined." if x <= 0 else math.log10(x)
+    def ln(self, x): 
+        return "Error: ln undefined." if x <= 0 else math.log(x)
+    def exp10(self, x):
+        return math.pow(10, x)
+    def exp_e(self, x): 
+        return math.exp(x)
+
+    def sin(self, x):
+        return math.sin(self.to_radians(x))
+    def cos(self, x):
+        return math.cos(self.to_radians(x))
+    def tan(self, x):
+        return math.tan(self.to_radians(x))
+    def asin(self, x): 
+        return "Math Error" if not -1 <= x <= 1 else (math.degrees(math.asin(x)) if self.angle_mode == "DEG" else math.asin(x))
+    def acos(self, x): 
+        return "Math Error" if not -1 <= x <= 1 else (math.degrees(math.acos(x)) if self.angle_mode == "DEG" else math.acos(x))
+    def atan(self, x):
+        return math.degrees(math.atan(x)) if self.angle_mode == "DEG" else math.atan(x)
+
+    def factorial(self, x):
+        if x < 0 or int(x) != x:
+            return "Error: Invalid input for factorial."
+        return math.factorial(int(x))
+
+    def abs_val(self, x):
+        return abs(x)
+    def floor(self, x):
+        return math.floor(x)
+    def ceil(self, x):
+        return math.ceil(x)
+    def trunc(self, x):
+        return math.trunc(x)
+    def round_val(self, x):
+        return round(x)
+    def pi(self):
+        return math.pi
+    def e(self):
+        return math.e
+    def solve_linear_equation(self, a, b):
+        if a == 0:
+            return "No solution" if b != 0 else "Infinite solutions"
+        return -b / a
+
+    def solve_quadratic(self, a, b, c):
+        d = b ** 2 - 4 * a * c
+        if d < 0:
+            return "No real solutions"
+        elif d == 0:
+            return -b / (2 * a)
+        else:
+            x1 = (-b + math.sqrt(d)) / (2 * a)
+            x2 = (-b - math.sqrt(d)) / (2 * a)
+            return x1, x2       
+def main():
+    calc = ScientificCalculator()
+    while True:
+        shift_menu = [
+            "Add",
+            "Subtract",
+            "Multiply",
+            "Divide",
+            "x^y",
+            "x^2",
+            "Cube Root",
+            "10^x",
+            "e^x",
+            "arcSin",
+            "arcCos",
+            "arcTan",
+            "Factorial",
+            "Absolute",
+            "Floor",
+            "Ceil",
+            "Truncate",
+            "Round",
+            "π",
+            "e",
+            "Toggle DEG/RAD",
+            "Toggle Shift",
+            "Solve Linear Equation",
+            "Solve Quadratic Equation",
+            "Ans",
+            "Exit"
+        ]
+
+        normal_menu = [
+            "Add",
+            "Subtract",
+            "Multiply",
+            "Divide",
+            "x^y",
+            "Square Root",
+            "Cube Root",
+            "Log10",
+            "Ln",
+            "Sin",
+            "Cos",
+            "Tan",
+            "Factorial",
+            "Absolute",
+            "Floor",
+            "Ceil",
+            "Truncate",
+            "Round",
+            "π",
+            "e",
+            "Toggle DEG/RAD",
+            "Toggle Shift",
+            "Solve Linear Equation",
+            "Solve Quadratic Equation",
+            "Ans",
+            "Exit The Program"
+        ]
+
+        print("\n--- Scientific Calculator ---")
+        print(f"Angle Mode: {calc.angle_mode} | Shift Mode: {'ON' if calc.shift_mode else 'OFF'}")
+        if calc.shift_mode:
+            menu = shift_menu 
+        else: menu=normal_menu
+
+        for i, item in enumerate(menu,1):
+            print(f"{i}. {item}")
+        choice = input("Choose an operation: ").strip()
+
+        if choice in ["1", "+"]:
+            x = float(input("Enter first number: "))
+            y = float(input("Enter second number: "))
+            calc.last_result = calc.add(x, y)
+            print("Result:", calc.last_result)
+
+        elif choice in ["2", "-"]:
+            x = float(input("Enter first number: "))
+            y = float(input("Enter second number: "))
+            calc.last_result = calc.subtract(x, y)
+            print("Result:", calc.last_result)
+
+        elif choice in ["3", "*"]:
+            x = float(input("Enter first number: "))
+            y = float(input("Enter second number: "))
+            calc.last_result = calc.multiply(x, y)
+            print("Result:", calc.last_result)
+
+        elif choice in ["4", "/"]:
+            x = float(input("Enter first number: "))
+            y = float(input("Enter second number: "))
+            calc.last_result = calc.divide(x, y)
+            print("Result:", calc.last_result)
+
+        elif choice in ["5", "power"]:
+            x = float(input("Enter base number: "))
+            y = float(input("Enter exponent: "))
+            calc.last_result = calc.power(x, y)
+            print("Result:", calc.last_result)
+
+        elif choice in ["6","squaring"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.square(x) if calc.shift_mode else calc.sqrt(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["7","cube root"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.cbrt(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["8", "log10", "10^x"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.exp10(x) if calc.shift_mode else calc.log10(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["9", "ln", "e^x"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.exp_e(x) if calc.shift_mode else calc.ln(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["10", "sin", "arcsin"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.asin(x) if calc.shift_mode else calc.sin(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["11", "cos", "arccos"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.acos(x) if calc.shift_mode else calc.cos(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["12", "tan", "arctan"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.atan(x) if calc.shift_mode else calc.tan(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["13", "!", "factorial"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.factorial(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["14", "abs", "|x|"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.abs_val(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["15", "floor"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.floor(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["16", "ceil"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.ceil(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["17", "trunc"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.trunc(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["18", "round"]:
+            x = float(input("Enter number: "))
+            calc.last_result = calc.round_val(x)
+            print("Result:", calc.last_result)
+
+        elif choice in ["19", "pi", "π"]:
+            calc.last_result = calc.pi()
+            print("Result:", calc.last_result)
+
+        elif choice in ["20", "e"]:
+            calc.last_result = calc.e()
+            print("Result:", calc.last_result)
+
+        elif choice in ["21", "toggle angle"]:
+            print(calc.toggle_angle_mode())
+
+        elif choice in ["22", "shift"]:
+            print(calc.toggle_shift())
+
+        elif choice in ["23", "linear equation"]:
+            a = float(input("Enter coefficient a: "))
+            b = float(input("Enter coefficient b: "))
+            result = calc.solve_linear_equation(a, b)
+            print("Result:", result)
+            calc.last_result = result
+
+        elif choice in ["24", "quadratic equation"]:
+            a = float(input("Enter coefficient a: "))
+            b = float(input("Enter coefficient b: "))
+            c = float(input("Enter coefficient c: "))
+            result = calc.solve_quadratic(a, b, c)
+            print("Result:", result)
+            calc.last_result = result
+
+        elif choice in ["25", "ans"]:
+            print("Result:", calc.last_result)
+
+        elif choice in ["26", "exit"]:
+            print("Exiting calculator. Goodbye!")
+            break
+
+        else:
+            print("Invalid option. Try again.")
+
+
+if __name__ == "__main__":
+    main()
