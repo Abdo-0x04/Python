@@ -1,0 +1,103 @@
+menu = {
+    1: {"name": "Margherita Pizza", "price": 100},
+    2: {"name": "Pepperoni Pizza", "price": 170},
+    3: {"name": "BBQ Chicken Pizza", "price": 220},
+    4: {"name": "Veggie Pizza", "price": 90},
+    5: {"name": "Burger", "price": 100},
+    6: {"name": "Pasta", "price": 60},
+    7: {"name": "Salad", "price": 30},
+    8: {"name": "Soda", "price": 15}
+}
+reserved_tables = []
+def display_menu():
+    print("\n Menu:")
+    for number, item in menu.items():
+        print(f"{number}. {item['name']} - {item['price']} EGP")
+def take_order():
+    order = []
+    display_menu()
+    while True:
+        choice = input("Enter item number to add to order (or 'done' to finish): ")
+        if choice.lower() == 'done':
+            break
+        elif choice.isdigit() and int(choice) in menu:
+            item = menu[int(choice)]
+            quantity_input = input(f"Enter quantity for {item['name']}: ")
+            if quantity_input.isdigit():
+                quantity = int(quantity_input)
+                order.append({
+                    "name": item["name"],
+                    "unit_price": item["price"],
+                    "quantity": quantity,
+                    "total_price": item["price"] * quantity
+                })
+                print(f"{quantity} x {item['name']} added.")
+            else:
+                print("Invalid quantity.")
+        else:
+            print("Invalid choice.")
+    return order
+def calc_bill(order):
+    print("\nYour Order:")
+    subtotal = 0
+    for item in order:
+        print(f"- {item['name']} x {item['quantity']} = {item['total_price']} EGP")
+        subtotal += item["total_price"]
+    print(f"\nSubtotal: {subtotal:.2f} EGP")
+    tax = subtotal * 0.14 
+    print(f"Tax (14%): {tax:.2f} EGP")
+    if subtotal > 1000:
+        discount_percent = 30
+    elif subtotal > 500:
+        discount_percent = 15
+    elif subtotal > 300:
+        discount_percent = 10
+    else:
+        discount_percent = 0
+    discount = (discount_percent / 100) * subtotal
+    if discount_percent > 0:
+        print(f"Automatic Discount ({discount_percent}%): -{discount:.2f} EGP")
+    else:
+        print("No discount applied.")
+    total = subtotal + tax - discount
+    print(f"Total bill after tax and discount: {total:.2f} EGP")
+    return total
+def reserve_table():
+    print("\n Table Reservation")
+    print(f"Tables reserved: {reserved_tables}")
+    table = input("Enter table number to reserve (1-10): ")
+    if table.isdigit():
+        table = int(table)
+        if table < 1 or table > 10:
+            print("Invalid table number.")
+        elif table in reserved_tables:
+            print("Table already reserved.")
+        else:
+            reserved_tables.append(table)
+            print(f"Table {table} reserved successfully.")
+    else:
+        print("Please enter a valid number.")
+def main():
+    while True:
+        print("\nWelcome to our Restaurant")
+        print("1. View Menu")
+        print("2. Take Order")
+        print("3. Reserve Table")
+        print("4. Exit")
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            display_menu()
+        elif choice == "2":
+            print("you will get a 30","%","discount if you ordered food over 1000 L.E")
+            order = take_order()
+            if order:
+                calc_bill(order)
+        elif choice == "3":
+            reserve_table()
+        elif choice == "4":
+            print("Thank you for visiting!")
+            break
+        else:
+            print("Invalid option.")
+main()
