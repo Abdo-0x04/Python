@@ -1,0 +1,42 @@
+todo_list = {"sunday": [], "monday": [], "tuesday": [], "wednesday": [], "thursday": [], "friday": [],"saturday": []}
+today = input("what day is it today?(sunday, monday, tuesday, wednesday, thursday, friday, saturday): ")
+while True:
+    if today not in todo_list:
+        print("Invalid day, please type a valid day of the week.")
+        continue
+    action = input("What do you want to do? (add, remove, review, done): ")      
+    if action == "add":
+        task = input("Enter the task to add: ").lower()
+        date = input("When do you want to add it? ").lower()
+        if date == "today":
+            date = today
+        if date in todo_list:
+            if task in todo_list[date]:
+                    print("Task is already in the list.")
+            else:
+                    todo_list[date].append(task)
+                    print("Task added to the list.")
+        else:
+                print("Invalid date category.")
+    elif action == "remove":
+        date = input("From which date category do you want to remove a task?: ")
+        if date in todo_list:
+            task = input("Enter the task to remove: ")
+            if task in todo_list[date]:
+                todo_list[date].remove(task)
+                print("Task removed from the list.")
+            else:
+                print("Task not found in the list for that date.")
+        else:
+            print("Invalid date category,please type a valid day of the week.")
+    elif action == "review":
+        for date, tasks in todo_list.items():
+            print(f"{date}:")
+            if tasks:
+                for item in tasks:
+                    print(f"- {item}")
+            else:
+                print("No tasks for this date.")
+    elif action == "done":
+        print("Thank you for using my to-do list!")
+        break
