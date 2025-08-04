@@ -1,0 +1,300 @@
+import pandas as pd
+import os
+class Student:
+    def __init__(self, name):
+        self.name = name
+        self.folder = f"students/{self.name}"
+        self.completed_file = os.path.join(self.folder, "completed.txt")
+        self.scores = {}
+
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
+
+        if not os.path.exists(self.completed_file):
+            with open(self.completed_file, 'w') as f:
+                pass
+
+    def has_completed(self, subject):
+        with open(self.completed_file, 'r') as f:
+            completed = f.read().splitlines()
+        return subject in completed
+
+    def mark_completed(self, subject):
+        with open(self.completed_file, 'a') as f:
+            f.write(f"{subject}\n")
+
+    def save_full_result(self, subject, answers, score, passed):
+        result_path = os.path.join(self.folder, f"{subject}_result.txt")
+        with open(result_path, 'w') as f:
+            for i, ans in enumerate(answers, 1):
+                f.write(f"Q{i}: {ans}\n")
+            f.write(f"\nFinal Score: {score}/100\n")
+            f.write(f"Status: {'Passed' if passed else 'Failed'}\n")
+
+    def get_results(self):
+        results = {}
+        for file in os.listdir(self.folder):
+            if file.endswith("_result.txt"):
+                subject = file.replace("_result.txt", "")
+                with open(os.path.join(self.folder, file), 'r') as f:
+                    results[subject] = f.read()
+        return results
+
+    def record_to_csv(self, subject, answers, score, passed):
+        status = "Passed" if passed else "Failed"
+        record = {
+            "Student": self.name,
+            "Subject": subject,
+            "Answers": "|".join(answers),
+            "Score": score,
+            "Status": status
+        }
+
+        file_path = "all_results.csv"
+        if not os.path.exists(file_path):
+            df = pd.DataFrame(columns=record.keys())
+            df.to_csv(file_path, index=False)
+
+        df = pd.read_csv(file_path)
+        df = pd.concat([df, pd.DataFrame([record])], ignore_index=True)
+        df.to_csv(file_path, index=False)
+class ExamSystem:
+    def __init__(self):
+        self.questions = {
+    "math": {
+        "Q1": ("What is 2 + 2?", ["1", "2", "4", "5"]),
+        "Q2": ("What is 5 * 3?", ["15", "10", "20", "30"]),
+        "Q3": ("What is 10 - 4?", ["4", "5", "6", "7"]),
+        "Q4": ("What is log10?", ["e", "1", "2", "10"]),
+        "Q5": ("What is the square root of 16?", ["2", "4", "8", "6"]),
+        "Q6": ("What is 3^2?", ["6", "9", "12", "8"]),
+        "Q7": ("What is 100 / 25?", ["4", "2", "5", "3"]),
+        "Q8": ("What is 7 + 6?", ["12", "13", "14", "11"]),
+        "Q9": ("What is the value of pi (approx)?", ["2.14", "3.14", "4.14", "5.14"]),
+        "Q10": ("What is 8 * 0?", ["0", "1", "8", "None"])
+    },
+    "physics": {
+        "Q1": ("What is the unit of Force?", ["Joule", "Newton", "Pascal", "Watt"]),
+        "Q2": ("Speed = Distance / ?", ["Time", "Mass", "Velocity", "Area"]),
+        "Q3": ("Symbol of Acceleration?", ["v", "a", "s", "t"]),
+        "Q4": ("What does a voltmeter measure?", ["Current", "Resistance", "Voltage", "Power"]),
+        "Q5": ("What is Newton's second law?", ["F = ma", "E = mc^2", "V = IR", "P = IV"]),
+        "Q6": ("What is the unit of energy?", ["Watt", "Joule", "Volt", "Newton"]),
+        "Q7": ("SI unit of power?", ["Watt", "Joule", "Ohm", "Ampere"]),
+        "Q8": ("What is the acceleration due to gravity on Earth?", ["9.8 m/s²", "10 m/s²", "8.5 m/s²", "12 m/s²"]),
+        "Q9": ("Who proposed the laws of motion?", ["Einstein", "Newton", "Tesla", "Faraday"]),
+        "Q10": ("What is Ohm's law?", ["V=IR", "P=IV", "F=ma", "E=mc^2"])
+    },
+    "english": {
+        "Q1": ("Synonym of 'Happy'?", ["Sad", "Joyful", "Angry", "Cold"]),
+        "Q2": ("Antonym of 'Hot'?", ["Warm", "Cool", "Cold", "Boiling"]),
+        "Q3": ("Plural of 'Child'?", ["Children", "Childs", "Chields", "Childes"]),
+        "Q4": ("Choose the correct spelling:", ["Recieve", "Receive", "Receeve", "Recaive"]),
+        "Q5": ("What is the noun in the sentence 'Ali runs fast'?", ["Ali", "runs", "fast", "the"]),
+        "Q6": ("What is the past tense of 'run'?", ["ran", "runed", "runned", "runs"]),
+        "Q7": ("Which word is an adjective?", ["blue", "quickly", "run", "sadly"]),
+        "Q8": ("What is a synonym of 'smart'?", ["dull", "intelligent", "loud", "brave"]),
+        "Q9": ("Choose the correct article: ___ apple", ["a", "an", "the", "none"]),
+        "Q10": ("Which is a verb?", ["eat", "blue", "angry", "quiet"])
+    }
+}
+        self.correct_answers = {
+    "math": ["4", "15", "6", "1", "4", "9", "4", "13", "3.14", "0"],
+    "physics": ["Newton", "Time", "a", "Voltage", "F = ma", "Joule", "Watt", "9.8 m/s²", "Newton", "V=IR"],
+    "english": ["Joyful", "Cold", "Children", "Receive", "Ali", "ran", "blue", "intelligent", "an", "eat"]
+}
+
+        self.save_model_answers()
+
+        if not os.path.exists("all_results.csv"):
+            df = pd.DataFrame(columns=["Student", "Subject", "Answers", "Score", "Status"])
+            df.to_csv("all_results.csv", index=False)
+
+    def save_model_answers(self):
+        if not os.path.exists("model_answers"):
+                os.makedirs("model_answers")
+        for subject, answers in self.correct_answers.items():
+            model_path = os.path.join("model_answers", f"{subject}_model.txt")
+            with open(model_path, 'w') as f:
+                for i, ans in enumerate(answers, 1):
+                    f.write(f"Q{i}: {ans}\n")
+
+    def has_taken_exam(self, student_name, subject):
+        df = pd.read_csv("all_results.csv")
+        taken = df[(df["Student"] == student_name) & (df["Subject"] == subject)]
+        return not taken.empty
+
+    def conduct_exam(self, student: Student, subject):
+        if student.has_completed(subject):
+            print(f"\n {student.name} has already completed {subject} exam.")
+            return
+        print(f"\nStarting {subject.capitalize()} exam for {student.name}")
+        answers = []
+        for q, (question, choices) in self.questions[subject].items():
+            print(f"{q} - {question}")
+            for x, choice in enumerate(choices, 1):
+             print(f"  {x}. {choice}")
+            choice_index = input("Your answer (1/2/3/4): ").strip()
+            if choice_index in ["1", "2", "3", "4"]:
+                answers.append(choices[int(choice_index) - 1])
+            else:
+                answers.append("")
+
+        self.grade_exam(student, subject, answers)
+        student.mark_completed(subject)
+
+    def grade_exam(self, student: Student, subject, student_answers):
+        correct = self.correct_answers[subject]
+        score = 0
+        for x, y in zip(student_answers, correct):
+            if x.strip().lower() == y.lower():
+                score += (100 / len(correct))
+        score = round(score)
+
+        passed = score >= 50
+        student.save_full_result(subject, student_answers, score, passed)
+
+        print(f"\n Result for {student.name} in {subject}: {score}/100")
+        print("Status:", " Passed" if passed else " Failed")
+
+        row = {
+            "Student": student.name,
+            "Subject": subject,
+            "Answers": "; ".join(student_answers),
+            "Score": score,
+            "Status": "Passed" if passed else "Failed"
+        }
+        df = pd.read_csv("all_results.csv")
+        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+        df.to_csv("all_results.csv", index=False)        
+class Teacher:
+    def __init__(self, name, exam_system):
+        self.name = name
+        self.system = exam_system
+
+    def add_question(self, subject, question_text, options, correct_answer):
+        if subject not in self.system.questions:
+            print(f"Subject '{subject}' not found.")
+            return
+
+        next_q= len(self.system.questions[subject]) + 1
+        q = f"Q{next_q}"
+
+        self.system.questions[subject][q] = (question_text, options)
+        self.system.correct_answers[subject].append(correct_answer)
+
+        print(f"Added question {q} to subject '{subject}'.")
+
+    def remove_question(self, subject, question_number):
+        if subject not in self.system.questions:
+            print(f"Subject '{subject}' not found.")
+            return
+
+        q = f"Q{question_number}"
+        if q not in self.system.questions[subject]:
+            print(f"Question {q} not found in subject '{subject}'.")
+            return
+
+        del self.system.questions[subject][q]
+        self.system.correct_answers[subject].pop(question_number - 1)
+
+        reordered = {}
+        for i, (key, value) in enumerate(sorted(self.system.questions[subject].items()), 1):
+            reordered[f"Q{i}"] = value
+        self.system.questions[subject] = reordered
+
+        print(f"Removed question {q} from subject '{subject}' and reordered questions.")
+def login():
+    while True:
+        role = input("Enter role (student/teacher or exit): ").strip().lower()
+        if role == "exit":
+            print("Goodbye")
+            return None, None
+        if role in ["student", "teacher"]:
+            name = input("Enter your name: ").strip()
+            return role, name
+        print("Invalid role.")
+
+def student_mode(system, name):
+    student = Student(name)
+    for subject in system.questions:
+        if student.has_completed(subject):
+            print(f"\nYou have already completed the {subject} exam.")
+            continue
+        print(f"\nDo you want to take {subject} exam? (yes/no)")
+        if input().strip().lower() == "yes":
+            system.conduct_exam(student, subject)
+
+    print("\nDo you want to view your results? (yes/no)")
+    if input().strip().lower() == "yes":
+        results = student.get_results()
+        for subj, content in results.items():
+            print(f"\n--- {subj.capitalize()} ---\n{content}")
+
+def teacher_mode(system, name):
+    teacher = Teacher(name, system)
+    while True:
+        print("\n--- Teacher Menu ---")
+        print("1. View all student results")
+        print("2. Add a question")
+        print("3. Remove a question")
+        print("4. View questions in a subject")
+        print("5. Switch user (re-login)")
+        print("6. Exit program")
+
+        choice = input("Enter your choice: ").strip()
+
+        if choice == "1":
+            file_path = os.path.join(os.getcwd(), "all_results.csv")
+            if os.path.exists(file_path):
+                df = pd.read_csv(file_path)
+                print(df)
+            else:
+                print("No results found yet.")
+
+        elif choice == "2":
+            subject = input("Enter subject name: ").strip().lower()
+            question = input("Enter question text: ")
+            options = [input(f"Option {i + 1}: ") for i in range(4)]
+            correct = input("Enter the correct answer: ")
+            teacher.add_question(subject, question, options, correct)
+
+        elif choice == "3":
+            subject = input("Enter subject name: ").strip().lower()
+            q_num = int(input("Enter question number to remove: "))
+            teacher.remove_question(subject, q_num)
+
+        elif choice == "4":
+            subject = input("Enter subject name: ").strip().lower()
+            if subject in system.questions:
+                for q_id, (text, opts) in system.questions[subject].items():
+                    print(f"\n{q_id}: {text}")
+                    for x, op in enumerate(opts, 1):
+                        print(f"  {x}. {op}")
+            else:
+                print("Subject not found.")
+
+        elif choice == "5":
+            print("Returning to login page...\n")
+            break
+
+        elif choice == "6":
+            print("Exiting program.")
+            exit()
+
+        else:
+            print("Invalid choice. Please try again.")
+
+def main():
+    system = ExamSystem()
+    while True:
+        role, name = login()
+        if role is None:
+            break
+        if role == "student":
+            student_mode(system, name)
+        elif role == "teacher":
+            teacher_mode(system, name)
+
+if __name__ == "__main__":
+    main()
